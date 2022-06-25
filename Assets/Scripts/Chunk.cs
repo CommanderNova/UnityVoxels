@@ -24,7 +24,8 @@ public class Chunk : MonoBehaviour
 
     private BlockTypes GetBlock(int x, int y, int z)
     {
-        return BlockTypes.Solid;
+        var total = x + y + z;
+        return total % 2 == 0 ? BlockTypes.Solid : BlockTypes.Air;
     }
     
     void GenerateChunk(int width, int height, int depth)
