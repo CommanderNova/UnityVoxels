@@ -9,19 +9,25 @@ enum BlockTypes
 public class Chunk : MonoBehaviour
 {
     [SerializeField]
-    private int width = 1;
-    [SerializeField]
-    private int depth = 1;
-    [SerializeField]
-    private int height = 1;
-
-    private int MaxBlockCount => width * depth * height;
+    ChunkData chunkData;
+    
+    private int MaxBlockCount => chunkData.width * chunkData.depth * chunkData.height;
     
     private Mesh mesh;
     private Vector3[] vertices;
     private int[] triangles;
     
-    private void Start()
+    private void Update()
+    {
+        GenerateChunk(chunkData.width, chunkData.height, chunkData.depth);
+    }
+
+    private BlockTypes GetBlock(int x, int y, int z)
+    {
+        return BlockTypes.Solid;
+    }
+    
+    void GenerateChunk(int width, int height, int depth)
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
@@ -175,11 +181,6 @@ public class Chunk : MonoBehaviour
         mesh.triangles = triangles;
 
         var duration = Time.realtimeSinceStartupAsDouble - startTime;
-        print("Duration: " + duration);
-    }
-    
-    private BlockTypes GetBlock(int x, int y, int z)
-    {
-        return BlockTypes.Solid;
+        print($"Duration: {(duration * 1000)}ms");
     }
 }

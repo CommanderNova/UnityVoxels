@@ -261,10 +261,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91107989ab28014ea9707f8696a55a5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stoneTemplate: {fileID: 0}
-  width: 1
-  depth: 1
-  height: 1
+  chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
 --- !u!23 &811533887
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -390,8 +387,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1462452074}
-  m_LocalRotation: {x: -0.45416647, y: -0.14919661, z: 0.07744749, w: -0.87491435}
-  m_LocalPosition: {x: 25.20926, y: 209.2737, z: -35.073498}
+  m_LocalRotation: {x: -0.10209109, y: 0.8558399, z: -0.1837771, w: -0.47259027}
+  m_LocalPosition: {x: 2.8895347, y: 1.5068973, z: 1.6898874}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
