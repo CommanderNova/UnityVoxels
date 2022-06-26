@@ -6,6 +6,12 @@ enum BlockTypes
     Solid,
 }
 
+struct BlockFaceSettings
+{
+    public Vector3Int neighbourOffset;
+    public int[] triangleIndices;
+}
+
 public class Chunk : MonoBehaviour
 {
     [SerializeField]
@@ -16,7 +22,43 @@ public class Chunk : MonoBehaviour
     private Mesh mesh;
     private Vector3[] vertices;
     private int[] triangles;
-    
+
+    private readonly BlockFaceSettings bottomFaceSettings = new BlockFaceSettings
+    {
+        neighbourOffset = Vector3Int.down,
+        triangleIndices = new[] { 0, 2, 1, 0, 3, 2 }
+    };
+
+    private readonly BlockFaceSettings backFaceSettings = new BlockFaceSettings
+    {
+        neighbourOffset = Vector3Int.back,
+        triangleIndices = new[] { 0, 4, 3, 4, 5, 3 }
+    };
+
+    private readonly BlockFaceSettings frontFaceSettings = new BlockFaceSettings
+    {
+        neighbourOffset = Vector3Int.forward,
+        triangleIndices = new[] { 1, 2, 6, 6, 2, 7 }
+    };
+
+    private readonly BlockFaceSettings topFaceSettings = new BlockFaceSettings
+    {
+        neighbourOffset = Vector3Int.up,
+        triangleIndices = new[] { 4, 6, 5, 5, 6, 7 }
+    };
+
+    private readonly BlockFaceSettings leftFaceSettings = new BlockFaceSettings
+    {
+        neighbourOffset = Vector3Int.left,
+        triangleIndices = new[] { 0, 1, 6, 0, 6, 4 }
+    };
+
+    private readonly BlockFaceSettings rightFaceSettings = new BlockFaceSettings
+    {
+        neighbourOffset = Vector3Int.right,
+        triangleIndices = new[] { 3, 5, 2, 2, 5, 7 }
+    };
+
     private void Update()
     {
         GenerateChunk(chunkData.width, chunkData.height, chunkData.depth);
@@ -24,8 +66,38 @@ public class Chunk : MonoBehaviour
 
     private BlockTypes GetBlock(int x, int y, int z)
     {
-        var total = x + y + z;
-        return total % 2 == 0 ? BlockTypes.Solid : BlockTypes.Air;
+        return BlockTypes.Solid;
+    }
+    
+    private bool IsBlockOutsideBoundaries(int x, int y, int z, int maxX, int maxY, int maxZ)
+    {
+        return !(x >= 0 && x < maxX &&
+                y >= 0 && y < maxY &&
+                z >= 0 && z < maxZ);
+    }
+
+    private void AddBlockFace(ref int triangleIndex, ref int[] triangles, int verticesStartIndex, int x, int y, int z, in BlockFaceSettings blockFaceSettings)
+    {
+        var neighbourPosX = x + blockFaceSettings.neighbourOffset.x;
+        var neighbourPosY = y + blockFaceSettings.neighbourOffset.y;
+        var neighbourPosZ = z + blockFaceSettings.neighbourOffset.z;
+        var neighbourBlock = GetBlock(neighbourPosX, neighbourPosY, neighbourPosZ);
+        if (neighbourBlock != BlockTypes.Solid || IsBlockOutsideBoundaries(neighbourPosX, neighbourPosY, neighbourPosZ, chunkData.width, chunkData.height, chunkData.depth))
+        {
+            triangleIndex++;
+            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[0];
+            triangleIndex++;
+            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[1];
+            triangleIndex++;
+            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[2];
+
+            triangleIndex++;
+            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[3];
+            triangleIndex++;
+            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[4];
+            triangleIndex++;
+            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[5];
+        }
     }
     
     void GenerateChunk(int width, int height, int depth)
@@ -82,96 +154,13 @@ public class Chunk : MonoBehaviour
 
                     // Start index for the current block of vertices
                     var verticesStartIndex = verticesIndex - 7;
-                    
-                    // Bottom Face
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 0;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 2;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 1;
-                    
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 0;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 3;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 2;
-                    
-                    // Back Face
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 0;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 4;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 3;
-                    
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 4;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 5;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 3;
-                    
-                    // Front Face
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 1;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 2;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 6;
-                    
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 6;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 2;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 7;
-                    
-                    // Top Face
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 4;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 6;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 5;
-                    
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 5;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 6;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 7;
-                    
-                    // Left Face
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 0;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 1;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 6;
-                    
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 0;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 6;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 4;
-                    
-                    // Right Face
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 3;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 5;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 2;
-                    
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 2;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 5;
-                    triangleIndex++;
-                    triangles[triangleIndex] = verticesStartIndex + 7;
+
+                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in bottomFaceSettings);
+                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in backFaceSettings);
+                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in frontFaceSettings);
+                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in topFaceSettings);
+                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in leftFaceSettings);
+                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in rightFaceSettings);
                 }
             }
         }
