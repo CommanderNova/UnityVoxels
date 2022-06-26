@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 enum BlockTypes
@@ -167,7 +168,10 @@ public class Chunk : MonoBehaviour
         
         mesh.Clear();
 
+        Array.Resize(ref vertices, verticesIndex + 1);
         mesh.vertices = vertices;
+        
+        Array.Resize(ref triangles, triangleIndex + 1);
         mesh.triangles = triangles;
 
         var duration = Time.realtimeSinceStartupAsDouble - startTime;
