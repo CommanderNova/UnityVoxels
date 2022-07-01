@@ -17,6 +17,8 @@ public class Chunk : MonoBehaviour
 {
     [SerializeField]
     ChunkData chunkData;
+
+    private bool dirty = true;
     
     private int MaxBlockCount => chunkData.width * chunkData.depth * chunkData.height;
     
@@ -62,9 +64,39 @@ public class Chunk : MonoBehaviour
 
     private void Update()
     {
-        GenerateChunk(chunkData.width, chunkData.height, chunkData.depth);
+        if (dirty)
+        {
+            dirty = false;
+            GenerateChunk(chunkData.width, chunkData.height, chunkData.depth);
+        }
     }
-
+    
+    void OnGUI()
+    {
+        if (dirty)
+        {
+            return;
+        }
+        
+        var posY = 25;
+        var oldValue = 0;
+        
+        oldValue = chunkData.width;
+        GUI.Label(new Rect(265, posY, 200, 30), $"width: {chunkData.width}");
+        chunkData.width = (int)GUI.HorizontalSlider(new Rect(25, posY, 200, 30), chunkData.width, 0, 16);
+        dirty |= chunkData.width != oldValue;
+        
+        oldValue = chunkData.depth;
+        GUI.Label(new Rect(265, posY + 25, 200, 30), $"depth: {chunkData.depth}");
+        chunkData.depth = (int)GUI.HorizontalSlider(new Rect(25, posY + 25, 200, 30), chunkData.depth, 0, 16);
+        dirty |= chunkData.depth != oldValue;
+        
+        oldValue = chunkData.height;
+        GUI.Label(new Rect(265, posY + 50, 200, 30), $"height: {chunkData.height}");
+        chunkData.height = (int)GUI.HorizontalSlider(new Rect(25, posY + 50, 200, 30), chunkData.height, 0, 256);
+        dirty |= chunkData.height != oldValue;
+    }
+    
     private BlockTypes GetBlock(int x, int y, int z)
     {
         return BlockTypes.Solid;
@@ -105,7 +137,9 @@ public class Chunk : MonoBehaviour
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
-
+        
+        print("Generating chunk...");
+        
         var startTime = Time.realtimeSinceStartupAsDouble;
 
         vertices = new Vector3[MaxBlockCount * 8];
