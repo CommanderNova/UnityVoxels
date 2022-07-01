@@ -120,16 +120,16 @@ public class Chunk : MonoBehaviour
             triangleIndex++;
             triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[0];
             triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[1];
+            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[1];
             triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[2];
+            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[2];
 
             triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[3];
+            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[3];
             triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[4];
+            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[4];
             triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex +  + blockFaceSettings.triangleIndices[5];
+            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[5];
         }
     }
     
