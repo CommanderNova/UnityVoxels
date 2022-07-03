@@ -1,11 +1,21 @@
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
+using Random = UnityEngine.Random;
 
 internal enum BlockTypes
 {
     Air,
     Solid,
+}
+
+internal enum DebugGenerationTypes
+{
+    Full,
+    Seconds,
+    Thirds,
+    Fourths,
+    Random,
 }
 
 internal struct BlockFaceSettings
@@ -19,6 +29,8 @@ public class Chunk : MonoBehaviour
     [SerializeField]
     private ChunkData chunkData;
 
+    private DebugGenerationTypes generationType = DebugGenerationTypes.Full;
+    private int seed = 0;
     private bool dirty = true;
     
     private int MaxBlockCount => chunkData.width * chunkData.depth * chunkData.height;
@@ -96,11 +108,65 @@ public class Chunk : MonoBehaviour
         GUI.Label(new Rect(265, posY + 50, 200, 30), $"height: {chunkData.height}");
         chunkData.height = (int)GUI.HorizontalSlider(new Rect(25, posY + 50, 200, 30), chunkData.height, 0, 256);
         dirty |= chunkData.height != oldValue;
+
+        if (GUI.Button(new Rect(350, posY, 100, 30), "Regenerate"))
+        {
+            dirty = true;
+        }
+        
+        var i = 0;
+        foreach (DebugGenerationTypes genType in Enum.GetValues(typeof(DebugGenerationTypes)))
+        {
+            posY = 100 + (i * 35);
+            
+            if (GUI.Button(new Rect(25, posY, 100, 30), genType.ToString()))
+            {
+                if (genType == DebugGenerationTypes.Random)
+                {
+                    seed = Random.Range(0, int.MaxValue);
+                }
+                
+                generationType = genType;
+                dirty = true;
+            }
+            
+            i++;
+        }
     }
     
     private BlockTypes GetBlock(int x, int y, int z)
     {
-        return BlockTypes.Solid;
+        var blockNum = x + y + z;
+        
+        switch (generationType)
+        {
+            case DebugGenerationTypes.Full:
+                return BlockTypes.Solid;
+            case DebugGenerationTypes.Seconds:
+                return blockNum % 2 == 1 ? BlockTypes.Solid : BlockTypes.Air;
+            case DebugGenerationTypes.Thirds:
+                return blockNum % 3 == 1 ? BlockTypes.Solid : BlockTypes.Air;
+            case DebugGenerationTypes.Fourths:
+                return blockNum % 4 == 1 ? BlockTypes.Solid : BlockTypes.Air;
+            case DebugGenerationTypes.Random:
+                Random.InitState(Hash(seed, x, y, z));
+                return Mathf.RoundToInt(Random.value) == 1 ? BlockTypes.Solid : BlockTypes.Air;
+            default:
+                throw new Exception("Generation type not found!");
+        }
+    }
+    
+    private static int Hash(int seed, params int[] numbers)
+    {
+        unchecked // Allow arithmetic overflow, numbers will just "wrap around"
+        {
+            var hashcode = seed;
+            foreach (var number in numbers)
+            {
+                hashcode = hashcode * 7302013 ^ number;
+            }
+            return hashcode;
+        }
     }
     
     private static bool IsBlockOutsideBoundaries(int x, int y, int z, int maxX, int maxY, int maxZ)
