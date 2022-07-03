@@ -1,22 +1,22 @@
 using System;
 using UnityEngine;
 
-enum BlockTypes
+internal enum BlockTypes
 {
     Air,
     Solid,
 }
 
-struct BlockFaceSettings
+internal struct BlockFaceSettings
 {
-    public Vector3Int neighbourOffset;
-    public int[] triangleIndices;
+    public Vector3Int NeighbourOffset;
+    public int[] TriangleIndices;
 }
 
 public class Chunk : MonoBehaviour
 {
     [SerializeField]
-    ChunkData chunkData;
+    private ChunkData chunkData;
 
     private bool dirty = true;
     
@@ -28,38 +28,38 @@ public class Chunk : MonoBehaviour
 
     private readonly BlockFaceSettings bottomFaceSettings = new BlockFaceSettings
     {
-        neighbourOffset = Vector3Int.down,
-        triangleIndices = new[] { 0, 2, 1, 0, 3, 2 }
+        NeighbourOffset = Vector3Int.down,
+        TriangleIndices = new[] { 0, 2, 1, 0, 3, 2 }
     };
 
     private readonly BlockFaceSettings backFaceSettings = new BlockFaceSettings
     {
-        neighbourOffset = Vector3Int.back,
-        triangleIndices = new[] { 0, 4, 3, 4, 5, 3 }
+        NeighbourOffset = Vector3Int.back,
+        TriangleIndices = new[] { 0, 4, 3, 4, 5, 3 }
     };
 
     private readonly BlockFaceSettings frontFaceSettings = new BlockFaceSettings
     {
-        neighbourOffset = Vector3Int.forward,
-        triangleIndices = new[] { 1, 2, 6, 6, 2, 7 }
+        NeighbourOffset = Vector3Int.forward,
+        TriangleIndices = new[] { 1, 2, 6, 6, 2, 7 }
     };
 
     private readonly BlockFaceSettings topFaceSettings = new BlockFaceSettings
     {
-        neighbourOffset = Vector3Int.up,
-        triangleIndices = new[] { 4, 6, 5, 5, 6, 7 }
+        NeighbourOffset = Vector3Int.up,
+        TriangleIndices = new[] { 4, 6, 5, 5, 6, 7 }
     };
 
     private readonly BlockFaceSettings leftFaceSettings = new BlockFaceSettings
     {
-        neighbourOffset = Vector3Int.left,
-        triangleIndices = new[] { 0, 1, 6, 0, 6, 4 }
+        NeighbourOffset = Vector3Int.left,
+        TriangleIndices = new[] { 0, 1, 6, 0, 6, 4 }
     };
 
     private readonly BlockFaceSettings rightFaceSettings = new BlockFaceSettings
     {
-        neighbourOffset = Vector3Int.right,
-        triangleIndices = new[] { 3, 5, 2, 2, 5, 7 }
+        NeighbourOffset = Vector3Int.right,
+        TriangleIndices = new[] { 3, 5, 2, 2, 5, 7 }
     };
 
     private void Update()
@@ -70,8 +70,8 @@ public class Chunk : MonoBehaviour
             GenerateChunk(chunkData.width, chunkData.height, chunkData.depth);
         }
     }
-    
-    void OnGUI()
+
+    private void OnGUI()
     {
         if (dirty)
         {
@@ -102,7 +102,7 @@ public class Chunk : MonoBehaviour
         return BlockTypes.Solid;
     }
     
-    private bool IsBlockOutsideBoundaries(int x, int y, int z, int maxX, int maxY, int maxZ)
+    private static bool IsBlockOutsideBoundaries(int x, int y, int z, int maxX, int maxY, int maxZ)
     {
         return !(x >= 0 && x < maxX &&
                 y >= 0 && y < maxY &&
@@ -112,18 +112,18 @@ public class Chunk : MonoBehaviour
     private static void AddBlockFace(ref int triangleIndex, ref int[] triangles, int verticesStartIndex, in BlockFaceSettings blockFaceSettings)
     {
         triangleIndex++;
-        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[0];
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[0];
         triangleIndex++;
-        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[1];
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[1];
         triangleIndex++;
-        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[2];
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[2];
 
         triangleIndex++;
-        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[3];
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[3];
         triangleIndex++;
-        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[4];
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[4];
         triangleIndex++;
-        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[5];
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[5];
     }
     
     /// <summary>
@@ -133,9 +133,9 @@ public class Chunk : MonoBehaviour
     /// <param name="blockFaceSettings">Settings for the face you want to check</param>
     private bool IsFaceNeighbourSolid(int x, int y, int z, in BlockFaceSettings blockFaceSettings)
     {
-        var neighbourPosX = x + blockFaceSettings.neighbourOffset.x;
-        var neighbourPosY = y + blockFaceSettings.neighbourOffset.y;
-        var neighbourPosZ = z + blockFaceSettings.neighbourOffset.z;
+        var neighbourPosX = x + blockFaceSettings.NeighbourOffset.x;
+        var neighbourPosY = y + blockFaceSettings.NeighbourOffset.y;
+        var neighbourPosZ = z + blockFaceSettings.NeighbourOffset.z;
         
         // Render faces that point outside of the chunk anyways for now, could be debug flagged as well
         // So dont make neighbour blocks that are outside of the boundaries count as solid
@@ -157,12 +157,12 @@ public class Chunk : MonoBehaviour
         return neighbourBlock == BlockTypes.Solid;
     }
     
-    void GenerateChunk(int width, int height, int depth)
+    private void GenerateChunk(int width, int height, int depth)
     {
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
         
-        print("Generating chunk...");
+        print($"Generating chunk (width: {chunkData.width}, height: {chunkData.height}, depth: {chunkData.depth}) ...");
         
         var startTime = Time.realtimeSinceStartupAsDouble;
 
@@ -255,7 +255,6 @@ public class Chunk : MonoBehaviour
                     {
                         AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in rightFaceSettings);
                     }
-                    
                 }
             }
         }
