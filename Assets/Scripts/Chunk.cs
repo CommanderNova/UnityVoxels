@@ -109,28 +109,52 @@ public class Chunk : MonoBehaviour
                 z >= 0 && z < maxZ);
     }
 
-    private void AddBlockFace(ref int triangleIndex, ref int[] triangles, int verticesStartIndex, int x, int y, int z, in BlockFaceSettings blockFaceSettings)
+    private static void AddBlockFace(ref int triangleIndex, ref int[] triangles, int verticesStartIndex, in BlockFaceSettings blockFaceSettings)
+    {
+        triangleIndex++;
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[0];
+        triangleIndex++;
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[1];
+        triangleIndex++;
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[2];
+
+        triangleIndex++;
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[3];
+        triangleIndex++;
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[4];
+        triangleIndex++;
+        triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[5];
+    }
+    
+    /// <summary>
+    /// Returns true if the neighbour of the specified face is solid
+    /// </summary>
+    /// x, y and z: The current blocks coordinates
+    /// <param name="blockFaceSettings">Settings for the face you want to check</param>
+    private bool IsFaceNeighbourSolid(int x, int y, int z, in BlockFaceSettings blockFaceSettings)
     {
         var neighbourPosX = x + blockFaceSettings.neighbourOffset.x;
         var neighbourPosY = y + blockFaceSettings.neighbourOffset.y;
         var neighbourPosZ = z + blockFaceSettings.neighbourOffset.z;
-        var neighbourBlock = GetBlock(neighbourPosX, neighbourPosY, neighbourPosZ);
-        if (neighbourBlock != BlockTypes.Solid || IsBlockOutsideBoundaries(neighbourPosX, neighbourPosY, neighbourPosZ, chunkData.width, chunkData.height, chunkData.depth))
+        
+        // Render faces that point outside of the chunk anyways for now, could be debug flagged as well
+        // So dont make neighbour blocks that are outside of the boundaries count as solid
+        var isNeighbourOutsideOfBoundary = IsBlockOutsideBoundaries(
+            neighbourPosX, 
+            neighbourPosY, 
+            neighbourPosZ, 
+            chunkData.width, 
+            chunkData.height, 
+            chunkData.depth
+        );
+        
+        if (isNeighbourOutsideOfBoundary)
         {
-            triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[0];
-            triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[1];
-            triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[2];
-
-            triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[3];
-            triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[4];
-            triangleIndex++;
-            triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.triangleIndices[5];
+            return false;
         }
+        
+        var neighbourBlock = GetBlock(neighbourPosX, neighbourPosY, neighbourPosZ);
+        return neighbourBlock == BlockTypes.Solid;
     }
     
     void GenerateChunk(int width, int height, int depth)
@@ -157,6 +181,18 @@ public class Chunk : MonoBehaviour
                     var blockType = GetBlock(x, y, z);
 
                     if (blockType != BlockTypes.Solid)
+                    {
+                        continue;
+                    }
+
+                    var bottomSolid = IsFaceNeighbourSolid(x, y, z, bottomFaceSettings);
+                    var backSolid = IsFaceNeighbourSolid(x, y, z, backFaceSettings);
+                    var frontSolid = IsFaceNeighbourSolid(x, y, z, frontFaceSettings);
+                    var topSolid = IsFaceNeighbourSolid(x, y, z, topFaceSettings);
+                    var leftSolid = IsFaceNeighbourSolid(x, y, z, leftFaceSettings);
+                    var rightSolid = IsFaceNeighbourSolid(x, y, z, rightFaceSettings);
+
+                    if (bottomSolid && backSolid && frontSolid && topSolid && leftSolid && rightSolid)
                     {
                         continue;
                     }
@@ -190,12 +226,36 @@ public class Chunk : MonoBehaviour
                     // Start index for the current block of vertices
                     var verticesStartIndex = verticesIndex - 7;
 
-                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in bottomFaceSettings);
-                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in backFaceSettings);
-                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in frontFaceSettings);
-                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in topFaceSettings);
-                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in leftFaceSettings);
-                    AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, x, y, z, in rightFaceSettings);
+                    if (!bottomSolid)
+                    {
+                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in bottomFaceSettings);
+                    }
+                    
+                    if (!backSolid)
+                    {
+                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in backFaceSettings);
+                    }
+                    
+                    if (!frontSolid)
+                    {
+                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in frontFaceSettings);
+                    }
+                    
+                    if (!topSolid)
+                    {
+                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in topFaceSettings);
+                    }
+                    
+                    if (!leftSolid)
+                    {
+                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in leftFaceSettings);
+                    }
+                    
+                    if (!rightSolid)
+                    {
+                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in rightFaceSettings);
+                    }
+                    
                 }
             }
         }
@@ -209,6 +269,7 @@ public class Chunk : MonoBehaviour
         mesh.triangles = triangles;
 
         var duration = Time.realtimeSinceStartupAsDouble - startTime;
+        print($"Vertices in the buffer: {verticesIndex}");
         print($"Duration: {(duration * 1000)}ms");
     }
 }
