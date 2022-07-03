@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 internal enum BlockTypes
 {
@@ -159,7 +160,11 @@ public class Chunk : MonoBehaviour
     
     private void GenerateChunk(int width, int height, int depth)
     {
-        mesh = new Mesh();
+        mesh = new Mesh
+        {
+            indexFormat = IndexFormat.UInt32,
+        };
+
         GetComponent<MeshFilter>().mesh = mesh;
         
         print($"Generating chunk (width: {chunkData.width}, height: {chunkData.height}, depth: {chunkData.depth}) ...");
@@ -268,7 +273,7 @@ public class Chunk : MonoBehaviour
         mesh.triangles = triangles;
 
         var duration = Time.realtimeSinceStartupAsDouble - startTime;
-        print($"Vertices in the buffer: {verticesIndex}");
+        print($"Vertices in the buffer: {verticesIndex + 1}");
         print($"Duration: {(duration * 1000)}ms");
     }
 }
