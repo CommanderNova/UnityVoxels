@@ -21,6 +21,7 @@ internal enum DebugGenerationTypes
 internal struct BlockFaceSettings
 {
     public Vector3Int NeighbourOffset;
+    public Vector3[] VertexIndices;
     public int[] TriangleIndices;
 }
 
@@ -38,41 +39,79 @@ public class Chunk : MonoBehaviour
     private Mesh mesh;
     private Vector3[] vertices;
     private int[] triangles;
-
+    
+    // [L = Left, R = Right] [B = Bottom, T = Top] [B = Back; F = Front]
+    
     private readonly BlockFaceSettings bottomFaceSettings = new BlockFaceSettings
     {
         NeighbourOffset = Vector3Int.down,
-        TriangleIndices = new[] { 0, 2, 1, 0, 3, 2 }
+        VertexIndices = new[] {
+            new Vector3(0, 0, 0), // LBB 0
+            new Vector3(0, 0, 1), // LBF 1
+            new Vector3(1, 0, 1), // RBF 2
+            new Vector3(1, 0, 0), // RBB 3
+        },
+        TriangleIndices = new[] { 0, 3, 1, 3, 2, 1 },
     };
 
     private readonly BlockFaceSettings backFaceSettings = new BlockFaceSettings
     {
         NeighbourOffset = Vector3Int.back,
-        TriangleIndices = new[] { 0, 4, 3, 4, 5, 3 }
+        VertexIndices = new[] {
+            new Vector3(0, 0, 0), // LBB 0
+            new Vector3(0, 1, 0), // LTB 1
+            new Vector3(1, 1, 0), // RTB 2
+            new Vector3(1, 0, 0), // RBB 3
+        },
+        TriangleIndices = new[] { 0, 1, 3, 3, 1, 2 },
     };
 
     private readonly BlockFaceSettings frontFaceSettings = new BlockFaceSettings
     {
         NeighbourOffset = Vector3Int.forward,
-        TriangleIndices = new[] { 1, 2, 6, 6, 2, 7 }
+        VertexIndices = new[] {
+            new Vector3(0, 0, 1), // LBF 0
+            new Vector3(0, 1, 1), // LTF 1
+            new Vector3(1, 1, 1), // RTF 2
+            new Vector3(1, 0, 1), // RBF 3
+        },
+        TriangleIndices = new[] { 0, 2, 1, 0, 3, 2 }
     };
 
     private readonly BlockFaceSettings topFaceSettings = new BlockFaceSettings
     {
         NeighbourOffset = Vector3Int.up,
-        TriangleIndices = new[] { 4, 6, 5, 5, 6, 7 }
+        VertexIndices = new[] {
+            new Vector3(0, 1, 0), // LTB 0
+            new Vector3(0, 1, 1), // LTF 1
+            new Vector3(1, 1, 1), // RTF 2
+            new Vector3(1, 1, 0), // RTB 3
+        },
+        TriangleIndices = new[] { 0, 1, 3, 3, 1, 2 }
     };
 
     private readonly BlockFaceSettings leftFaceSettings = new BlockFaceSettings
     {
         NeighbourOffset = Vector3Int.left,
-        TriangleIndices = new[] { 0, 1, 6, 0, 6, 4 }
+        VertexIndices = new[] {
+            new Vector3(0, 0, 0), // LBB 0
+            new Vector3(0, 0, 1), // LBF 1
+            new Vector3(0, 1, 1), // LTF 2
+            new Vector3(0, 1, 0), // LTB 3
+        },
+        TriangleIndices = new[] { 0, 1, 2, 0, 2, 3 }
     };
 
     private readonly BlockFaceSettings rightFaceSettings = new BlockFaceSettings
     {
         NeighbourOffset = Vector3Int.right,
-        TriangleIndices = new[] { 3, 5, 2, 2, 5, 7 }
+        VertexIndices = new[] {
+            new Vector3(1, 0, 0), // RBB 0
+            new Vector3(1, 0, 1), // RBF 1
+            new Vector3(1, 1, 1), // RTF 2
+            new Vector3(1, 1, 0), // RTB 3
+        },
+        TriangleIndices = new[] { 0, 3, 1, 1, 3, 2 }
     };
 
     private void Update()
@@ -176,7 +215,34 @@ public class Chunk : MonoBehaviour
                 z >= 0 && z < maxZ);
     }
 
-    private static void AddBlockFace(ref int triangleIndex, ref int[] triangles, int verticesStartIndex, in BlockFaceSettings blockFaceSettings)
+    private static void AddBlockVertices(in int x, in int y, in int z, ref int verticesIndex, ref Vector3[] vertices, in BlockFaceSettings blockFaceSettings)
+    {
+        verticesIndex++;
+        vertices[verticesIndex] = blockFaceSettings.VertexIndices[0];
+        vertices[verticesIndex].x += x;
+        vertices[verticesIndex].y += y;
+        vertices[verticesIndex].z += z;
+        
+        verticesIndex++;
+        vertices[verticesIndex] = blockFaceSettings.VertexIndices[1];
+        vertices[verticesIndex].x += x;
+        vertices[verticesIndex].y += y;
+        vertices[verticesIndex].z += z;
+        
+        verticesIndex++;
+        vertices[verticesIndex] = blockFaceSettings.VertexIndices[2];
+        vertices[verticesIndex].x += x;
+        vertices[verticesIndex].y += y;
+        vertices[verticesIndex].z += z;
+        
+        verticesIndex++;
+        vertices[verticesIndex] = blockFaceSettings.VertexIndices[3];
+        vertices[verticesIndex].x += x;
+        vertices[verticesIndex].y += y;
+        vertices[verticesIndex].z += z;
+    }
+
+    private static void AddBlockTriangles(ref int triangleIndex, ref int[] triangles, int verticesStartIndex, in BlockFaceSettings blockFaceSettings)
     {
         triangleIndex++;
         triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[0];
@@ -237,7 +303,7 @@ public class Chunk : MonoBehaviour
         
         var startTime = Time.realtimeSinceStartupAsDouble;
 
-        vertices = new Vector3[MaxBlockCount * 8];
+        vertices = new Vector3[MaxBlockCount * 24];
         var verticesIndex = -1;
 
         triangles = new int[MaxBlockCount * 36];
@@ -267,64 +333,53 @@ public class Chunk : MonoBehaviour
                     {
                         continue;
                     }
-                    
-                    // [B = Back; F = Forward] [B = Bottom, T = Top] [L = Left, R = Right]
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(0 + x, 0 + y, 0 + z); // BBL 0
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(0 + x, 0 + y, 1 + z); // FBL 1
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(1 + x, 0 + y, 1 + z); // FBR 2
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(1 + x, 0 + y, 0 + z); // BBR 3
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(0 + x, 1 + y, 0 + z); // BTL 4
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(1 + x, 1 + y, 0 + z); // BTR 5
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(0 + x, 1 + y, 1 + z); // FTL 6
-                    
-                    verticesIndex++;
-                    vertices[verticesIndex] = new Vector3(1 + x, 1 + y, 1 + z); // FTR 7
-
-                    // Start index for the current block of vertices
-                    var verticesStartIndex = verticesIndex - 7;
 
                     if (!bottomSolid)
                     {
-                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in bottomFaceSettings);
+                        AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in bottomFaceSettings);
+                        
+                        var verticesStartIndex = verticesIndex - 3;
+                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in bottomFaceSettings);
                     }
                     
                     if (!backSolid)
                     {
-                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in backFaceSettings);
+                        AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in backFaceSettings);
+                        
+                        var verticesStartIndex = verticesIndex - 3;
+                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in backFaceSettings);
                     }
                     
                     if (!frontSolid)
                     {
-                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in frontFaceSettings);
+                        AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in frontFaceSettings);
+                        
+                        var verticesStartIndex = verticesIndex - 3;
+                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in frontFaceSettings);
                     }
                     
                     if (!topSolid)
                     {
-                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in topFaceSettings);
+                        AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in topFaceSettings);
+                        
+                        var verticesStartIndex = verticesIndex - 3;
+                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in topFaceSettings);
                     }
                     
                     if (!leftSolid)
                     {
-                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in leftFaceSettings);
+                        AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in leftFaceSettings);
+                        
+                        var verticesStartIndex = verticesIndex - 3;
+                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in leftFaceSettings);
                     }
                     
                     if (!rightSolid)
                     {
-                        AddBlockFace(ref triangleIndex, ref triangles, verticesStartIndex, in rightFaceSettings);
+                        AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in rightFaceSettings);
+                        
+                        var verticesStartIndex = verticesIndex - 3;
+                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in rightFaceSettings);
                     }
                 }
             }
