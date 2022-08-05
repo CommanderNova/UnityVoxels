@@ -23,6 +23,7 @@ internal struct BlockFaceSettings
     public Vector3Int NeighbourOffset;
     public Vector3[] VertexIndices;
     public int[] TriangleIndices;
+    public Vector2[] UvIndices;
 }
 
 public class Chunk : MonoBehaviour
@@ -38,6 +39,7 @@ public class Chunk : MonoBehaviour
     
     private Mesh mesh;
     private Vector3[] vertices;
+    private Vector2[] uvs;
     private int[] triangles;
     
     // [L = Left, R = Right] [B = Bottom, T = Top] [B = Back; F = Front]
@@ -52,6 +54,13 @@ public class Chunk : MonoBehaviour
             new Vector3(1, 0, 0), // RBB 3
         },
         TriangleIndices = new[] { 0, 3, 1, 3, 2, 1 },
+        UvIndices = new[] 
+        {
+            new Vector2(0.33333f, 1.00f),
+            new Vector2(0.33333f, 0.75f),
+            new Vector2(0.66666f, 0.75f),
+            new Vector2(0.66666f, 1.00f),
+        },
     };
 
     private readonly BlockFaceSettings backFaceSettings = new BlockFaceSettings
@@ -64,6 +73,13 @@ public class Chunk : MonoBehaviour
             new Vector3(1, 0, 0), // RBB 3
         },
         TriangleIndices = new[] { 0, 1, 3, 3, 1, 2 },
+        UvIndices = new[] 
+        {
+            new Vector2(0.33333f, 0.00f),
+            new Vector2(0.33333f, 0.25f),
+            new Vector2(0.66666f, 0.25f),
+            new Vector2(0.66666f, 0.00f),
+        },
     };
 
     private readonly BlockFaceSettings frontFaceSettings = new BlockFaceSettings
@@ -75,7 +91,14 @@ public class Chunk : MonoBehaviour
             new Vector3(1, 1, 1), // RTF 2
             new Vector3(1, 0, 1), // RBF 3
         },
-        TriangleIndices = new[] { 0, 2, 1, 0, 3, 2 }
+        TriangleIndices = new[] { 0, 2, 1, 0, 3, 2 },
+        UvIndices = new[] 
+        {
+            new Vector2(0.33333f, 0.75f),
+            new Vector2(0.33333f, 0.50f),
+            new Vector2(0.66666f, 0.50f),
+            new Vector2(0.66666f, 0.75f),
+        },
     };
 
     private readonly BlockFaceSettings topFaceSettings = new BlockFaceSettings
@@ -87,7 +110,14 @@ public class Chunk : MonoBehaviour
             new Vector3(1, 1, 1), // RTF 2
             new Vector3(1, 1, 0), // RTB 3
         },
-        TriangleIndices = new[] { 0, 1, 3, 3, 1, 2 }
+        TriangleIndices = new[] { 0, 1, 3, 3, 1, 2 },
+        UvIndices = new[] 
+        {
+            new Vector2(0.33333f, 0.25f),
+            new Vector2(0.33333f, 0.50f),
+            new Vector2(0.66666f, 0.50f),
+            new Vector2(0.66666f, 0.25f),
+        },
     };
 
     private readonly BlockFaceSettings leftFaceSettings = new BlockFaceSettings
@@ -99,7 +129,14 @@ public class Chunk : MonoBehaviour
             new Vector3(0, 1, 1), // LTF 2
             new Vector3(0, 1, 0), // LTB 3
         },
-        TriangleIndices = new[] { 0, 1, 2, 0, 2, 3 }
+        TriangleIndices = new[] { 0, 1, 2, 0, 2, 3 },
+        UvIndices = new[] 
+        {
+            new Vector2(0.00f, 0.25f),
+            new Vector2(0.00f, 0.50f),
+            new Vector2(0.33333f, 0.50f),
+            new Vector2(0.33333f, 0.25f),
+        },
     };
 
     private readonly BlockFaceSettings rightFaceSettings = new BlockFaceSettings
@@ -111,7 +148,14 @@ public class Chunk : MonoBehaviour
             new Vector3(1, 1, 1), // RTF 2
             new Vector3(1, 1, 0), // RTB 3
         },
-        TriangleIndices = new[] { 0, 3, 1, 1, 3, 2 }
+        TriangleIndices = new[] { 0, 3, 1, 1, 3, 2 },
+        UvIndices = new[] 
+        {
+            new Vector2(1.00f, 0.25f),
+            new Vector2(1.00f, 0.50f),
+            new Vector2(0.66666f, 0.50f),
+            new Vector2(0.66666f, 0.25f),
+        },
     };
 
     private void Update()
@@ -242,7 +286,7 @@ public class Chunk : MonoBehaviour
         vertices[verticesIndex].z += z;
     }
 
-    private static void AddBlockTriangles(ref int triangleIndex, ref int[] triangles, int verticesStartIndex, in BlockFaceSettings blockFaceSettings)
+    private static void AddBlockTriangles(ref int triangleIndex, ref int[] triangles, in int verticesStartIndex, in BlockFaceSettings blockFaceSettings)
     {
         triangleIndex++;
         triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[0];
@@ -259,12 +303,24 @@ public class Chunk : MonoBehaviour
         triangles[triangleIndex] = verticesStartIndex + blockFaceSettings.TriangleIndices[5];
     }
     
+    private static void AddBlockUvs(ref int uvIndex, ref Vector2[] uvs, in BlockFaceSettings blockFaceSettings)
+    {
+        uvIndex++;
+        uvs[uvIndex] = blockFaceSettings.UvIndices[0];
+        uvIndex++;
+        uvs[uvIndex] = blockFaceSettings.UvIndices[1];
+        uvIndex++;
+        uvs[uvIndex] = blockFaceSettings.UvIndices[2];
+        uvIndex++;
+        uvs[uvIndex] = blockFaceSettings.UvIndices[3];
+    }
+    
     /// <summary>
     /// Returns true if the neighbour of the specified face is solid
     /// </summary>
     /// x, y and z: The current blocks coordinates
     /// <param name="blockFaceSettings">Settings for the face you want to check</param>
-    private bool IsFaceNeighbourSolid(int x, int y, int z, in BlockFaceSettings blockFaceSettings)
+    private bool IsFaceNeighbourSolid(in int x, in int y, in int z, in BlockFaceSettings blockFaceSettings)
     {
         var neighbourPosX = x + blockFaceSettings.NeighbourOffset.x;
         var neighbourPosY = y + blockFaceSettings.NeighbourOffset.y;
@@ -306,6 +362,9 @@ public class Chunk : MonoBehaviour
         vertices = new Vector3[MaxBlockCount * 24];
         var verticesIndex = -1;
 
+        uvs = new Vector2[vertices.Length];
+        var uvsIndex = -1;
+        
         triangles = new int[MaxBlockCount * 36];
         var triangleIndex = -1;
 
@@ -322,12 +381,12 @@ public class Chunk : MonoBehaviour
                         continue;
                     }
 
-                    var bottomSolid = IsFaceNeighbourSolid(x, y, z, bottomFaceSettings);
-                    var backSolid = IsFaceNeighbourSolid(x, y, z, backFaceSettings);
-                    var frontSolid = IsFaceNeighbourSolid(x, y, z, frontFaceSettings);
-                    var topSolid = IsFaceNeighbourSolid(x, y, z, topFaceSettings);
-                    var leftSolid = IsFaceNeighbourSolid(x, y, z, leftFaceSettings);
-                    var rightSolid = IsFaceNeighbourSolid(x, y, z, rightFaceSettings);
+                    var bottomSolid = IsFaceNeighbourSolid(in x, in y, in z, in bottomFaceSettings);
+                    var backSolid = IsFaceNeighbourSolid(in x, in y, in z, in backFaceSettings);
+                    var frontSolid = IsFaceNeighbourSolid(in x, in y, in z, in frontFaceSettings);
+                    var topSolid = IsFaceNeighbourSolid(in x, in y, in z, in topFaceSettings);
+                    var leftSolid = IsFaceNeighbourSolid(in x, in y, in z, in leftFaceSettings);
+                    var rightSolid = IsFaceNeighbourSolid(in x, in y, in z, in rightFaceSettings);
 
                     if (bottomSolid && backSolid && frontSolid && topSolid && leftSolid && rightSolid)
                     {
@@ -339,7 +398,8 @@ public class Chunk : MonoBehaviour
                         AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in bottomFaceSettings);
                         
                         var verticesStartIndex = verticesIndex - 3;
-                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in bottomFaceSettings);
+                        AddBlockTriangles(ref triangleIndex, ref triangles, in verticesStartIndex, in bottomFaceSettings);
+                        AddBlockUvs(ref uvsIndex, ref uvs, in bottomFaceSettings);
                     }
                     
                     if (!backSolid)
@@ -347,7 +407,8 @@ public class Chunk : MonoBehaviour
                         AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in backFaceSettings);
                         
                         var verticesStartIndex = verticesIndex - 3;
-                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in backFaceSettings);
+                        AddBlockTriangles(ref triangleIndex, ref triangles, in verticesStartIndex, in backFaceSettings);
+                        AddBlockUvs(ref uvsIndex, ref uvs, in backFaceSettings);
                     }
                     
                     if (!frontSolid)
@@ -355,7 +416,8 @@ public class Chunk : MonoBehaviour
                         AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in frontFaceSettings);
                         
                         var verticesStartIndex = verticesIndex - 3;
-                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in frontFaceSettings);
+                        AddBlockTriangles(ref triangleIndex, ref triangles, in verticesStartIndex, in frontFaceSettings);
+                        AddBlockUvs(ref uvsIndex, ref uvs, in frontFaceSettings);
                     }
                     
                     if (!topSolid)
@@ -363,7 +425,8 @@ public class Chunk : MonoBehaviour
                         AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in topFaceSettings);
                         
                         var verticesStartIndex = verticesIndex - 3;
-                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in topFaceSettings);
+                        AddBlockTriangles(ref triangleIndex, ref triangles, in verticesStartIndex, in topFaceSettings);
+                        AddBlockUvs(ref uvsIndex, ref uvs, in topFaceSettings);
                     }
                     
                     if (!leftSolid)
@@ -371,7 +434,8 @@ public class Chunk : MonoBehaviour
                         AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in leftFaceSettings);
                         
                         var verticesStartIndex = verticesIndex - 3;
-                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in leftFaceSettings);
+                        AddBlockTriangles(ref triangleIndex, ref triangles, in verticesStartIndex, in leftFaceSettings);
+                        AddBlockUvs(ref uvsIndex, ref uvs, in leftFaceSettings);
                     }
                     
                     if (!rightSolid)
@@ -379,7 +443,8 @@ public class Chunk : MonoBehaviour
                         AddBlockVertices(in x, in y, in z, ref verticesIndex, ref vertices, in rightFaceSettings);
                         
                         var verticesStartIndex = verticesIndex - 3;
-                        AddBlockTriangles(ref triangleIndex, ref triangles, verticesStartIndex, in rightFaceSettings);
+                        AddBlockTriangles(ref triangleIndex, ref triangles, in verticesStartIndex, in rightFaceSettings);
+                        AddBlockUvs(ref uvsIndex, ref uvs, in rightFaceSettings);
                     }
                 }
             }
@@ -389,6 +454,9 @@ public class Chunk : MonoBehaviour
 
         Array.Resize(ref vertices, verticesIndex + 1);
         mesh.vertices = vertices;
+        
+        Array.Resize(ref uvs, uvsIndex + 1);
+        mesh.uv = uvs;
         
         Array.Resize(ref triangles, triangleIndex + 1);
         mesh.triangles = triangles;
