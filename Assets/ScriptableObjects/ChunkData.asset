@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40feb5e24cb9c8f46a08bbf71a61d0e9, type: 3}
   m_Name: ChunkData
   m_EditorClassIdentifier: 
-  width: 2
-  depth: 2
-  height: 1
+  width: 16
+  depth: 16
+  height: 5

@@ -3,15 +3,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
 
-internal enum DebugGenerationTypes
-{
-    Full,
-    Seconds,
-    Thirds,
-    Fourths,
-    Random,
-}
-
 public class Chunk : MonoBehaviour
 {
     [SerializeField]
@@ -19,9 +10,14 @@ public class Chunk : MonoBehaviour
 
     public const int MaxChunkHorizontalSize = 16;
 
-    private DebugGenerationTypes generationType = DebugGenerationTypes.Full;
-    private int seed = 0;
-    private bool dirty = true;
+    [HideInInspector]
+    internal DebugGenerationTypes generationType = DebugGenerationTypes.Random;
+    
+    [HideInInspector]
+    public int seed = 0;
+    
+    [HideInInspector]
+    public bool dirty = true;
     
     private int MaxBlockCount => chunkData.width * chunkData.depth * chunkData.height;
     
@@ -39,57 +35,6 @@ public class Chunk : MonoBehaviour
         }
     }
 
-    private void OnGUI()
-    {
-        if (dirty)
-        {
-            return;
-        }
-        
-        var posY = 25;
-        var oldValue = 0;
-        
-        oldValue = chunkData.width;
-        GUI.Label(new Rect(265, posY, 200, 30), $"width: {chunkData.width}");
-        chunkData.width = (int)GUI.HorizontalSlider(new Rect(25, posY, 200, 25), chunkData.width, 0, MaxChunkHorizontalSize);
-        dirty |= chunkData.width != oldValue;
-        
-        oldValue = chunkData.depth;
-        GUI.Label(new Rect(265, posY + 25, 200, 30), $"depth: {chunkData.depth}");
-        chunkData.depth = (int)GUI.HorizontalSlider(new Rect(25, posY + 25, 200, 25), chunkData.depth, 0, MaxChunkHorizontalSize);
-        dirty |= chunkData.depth != oldValue;
-        
-        oldValue = chunkData.height;
-        GUI.Label(new Rect(265, posY + 50, 200, 30), $"height: {chunkData.height}");
-        chunkData.height = (int)GUI.HorizontalSlider(new Rect(25, posY + 50, 200, 25), chunkData.height, 0, 256);
-        dirty |= chunkData.height != oldValue;
-
-        if (GUI.Button(new Rect(350, posY, 100, 30), "Regenerate"))
-        {
-            seed = Random.Range(0, int.MaxValue);
-            dirty = true;
-        }
-        
-        var i = 0;
-        foreach (DebugGenerationTypes genType in Enum.GetValues(typeof(DebugGenerationTypes)))
-        {
-            posY = 100 + (i * 35);
-            
-            if (GUI.Button(new Rect(25, posY, 100, 30), genType.ToString()))
-            {
-                if (genType == DebugGenerationTypes.Random)
-                {
-                    seed = Random.Range(0, int.MaxValue);
-                }
-                
-                generationType = genType;
-                dirty = true;
-            }
-            
-            i++;
-        }
-    }
-    
     private BlockTypes GetBlock(int x, int y, int z)
     {
         var blockNum = x + y + z;

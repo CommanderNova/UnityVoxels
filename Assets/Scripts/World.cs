@@ -3,7 +3,7 @@ using UnityEngine;
 public class World : MonoBehaviour
 {
     [SerializeField]
-    private int renderDistance = 8;
+    private int renderRadius = 8;
 
     [SerializeField]
     private GameObject chunkTemplate;
@@ -13,9 +13,9 @@ public class World : MonoBehaviour
         var center = GetGridPosition(transform.position);
 
         var halfChunkSize = Chunk.MaxChunkHorizontalSize / 2;
-        for (var x = Chunk.MaxChunkHorizontalSize * -renderDistance; x < Chunk.MaxChunkHorizontalSize * renderDistance; x += Chunk.MaxChunkHorizontalSize)
+        for (var x = Chunk.MaxChunkHorizontalSize * -renderRadius; x < Chunk.MaxChunkHorizontalSize * renderRadius; x += Chunk.MaxChunkHorizontalSize)
         {
-            for (var z = Chunk.MaxChunkHorizontalSize * -renderDistance; z < Chunk.MaxChunkHorizontalSize * renderDistance; z += Chunk.MaxChunkHorizontalSize)
+            for (var z = Chunk.MaxChunkHorizontalSize * -renderRadius; z < Chunk.MaxChunkHorizontalSize * renderRadius; z += Chunk.MaxChunkHorizontalSize)
             {
                 var newPosition = new Vector3
                 (
@@ -26,7 +26,12 @@ public class World : MonoBehaviour
 
                 newPosition = GetGridPosition(newPosition);
 
-                Instantiate(chunkTemplate, newPosition, Quaternion.identity, transform);
+                var newObject = Instantiate(chunkTemplate, newPosition, Quaternion.identity, transform);
+                var chunk = newObject.GetComponent<Chunk>();
+                if (chunk)
+                {
+                    chunk.chunkData = Instantiate(chunk.chunkData);
+                }
             }
         }
     }
