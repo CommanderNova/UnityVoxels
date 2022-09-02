@@ -15,7 +15,9 @@ internal enum DebugGenerationTypes
 public class Chunk : MonoBehaviour
 {
     [SerializeField]
-    private ChunkData chunkData;
+    public ChunkData chunkData;
+
+    public const int MaxChunkHorizontalSize = 16;
 
     private DebugGenerationTypes generationType = DebugGenerationTypes.Full;
     private int seed = 0;
@@ -49,12 +51,12 @@ public class Chunk : MonoBehaviour
         
         oldValue = chunkData.width;
         GUI.Label(new Rect(265, posY, 200, 30), $"width: {chunkData.width}");
-        chunkData.width = (int)GUI.HorizontalSlider(new Rect(25, posY, 200, 25), chunkData.width, 0, 16);
+        chunkData.width = (int)GUI.HorizontalSlider(new Rect(25, posY, 200, 25), chunkData.width, 0, MaxChunkHorizontalSize);
         dirty |= chunkData.width != oldValue;
         
         oldValue = chunkData.depth;
         GUI.Label(new Rect(265, posY + 25, 200, 30), $"depth: {chunkData.depth}");
-        chunkData.depth = (int)GUI.HorizontalSlider(new Rect(25, posY + 25, 200, 25), chunkData.depth, 0, 16);
+        chunkData.depth = (int)GUI.HorizontalSlider(new Rect(25, posY + 25, 200, 25), chunkData.depth, 0, MaxChunkHorizontalSize);
         dirty |= chunkData.depth != oldValue;
         
         oldValue = chunkData.height;
