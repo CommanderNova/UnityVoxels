@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   width: 16
   depth: 16
-  height: 5
+  height: 256

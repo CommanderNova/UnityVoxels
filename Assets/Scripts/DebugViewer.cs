@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 internal enum DebugGenerationTypes
@@ -10,11 +11,20 @@ internal enum DebugGenerationTypes
     Thirds,
     Fourths,
     Random,
+    Procedural,
 }
 
 public class DebugViewer : MonoBehaviour
 {
     private Chunk notSelectedChunk;
+
+    [SerializeField]
+    private RawImage noiseViewer;
+
+    [SerializeField]
+    private GameObject noiseUIGroup;
+
+    private GameObject selectedGameObject;
     
     private void Start()
     {
@@ -30,15 +40,49 @@ public class DebugViewer : MonoBehaviour
     private void OnGUI()
     {
         var activeObject = Selection.activeGameObject;
+        var isSameObject = selectedGameObject == activeObject;
+        selectedGameObject = activeObject;
+        
         var activeChunk = activeObject ? activeObject.GetComponent<Chunk>() : null;
-        if (activeChunk)
+        if (isSameObject)
         {
-            OnChunkUpdate(activeChunk);
+            if (activeChunk)
+            {
+                OnChunkUpdate(activeChunk);
+            }
+            else
+            {
+                GUI.Label(new Rect(25, 25, 200, 30), "Select Chunk to debug");
+            }
         }
         else
         {
-            GUI.Label(new Rect(25, 25, 200, 30), "Select Chunk to debug");
+            OnChunkChanged(activeChunk);
         }
+    }
+
+    private void OnChunkChanged(Chunk chunk)
+    {
+        noiseUIGroup.SetActive(chunk);
+        if (!chunk)
+        {
+            return;
+        }
+        
+        var chunkData = chunk.chunkData;
+        chunk.debugNoise = new Texture2D(chunkData.width, chunkData.depth);
+
+        for (var x = 0; x < chunkData.width; ++x)
+        {
+            for (var z = 0; z < chunkData.depth; ++z)
+            {
+                var value = chunk.GetNoise(chunk.Seed, x, z);
+                chunk.debugNoise.SetPixel(x, z, new Color(1.0f * value, 1.0f * value, 1.0f * value));
+            }
+        }
+        
+        chunk.debugNoise.Apply();
+        noiseViewer.texture = chunk.debugNoise;
     }
     
     private void OnChunkUpdate(Chunk chunk)
@@ -68,10 +112,15 @@ public class DebugViewer : MonoBehaviour
 
         if (GUI.Button(new Rect(350, posY, 100, 30), "Regenerate"))
         {
-            chunk.seed = Random.Range(0, int.MaxValue);
+            chunk.Seed = Random.Range(0, int.MaxValue);
             chunk.dirty = true;
         }
-        
+
+        if (chunk.dirty)
+        {
+            OnChunkChanged(chunk);
+        }
+
         var i = 0;
         foreach (DebugGenerationTypes genType in Enum.GetValues(typeof(DebugGenerationTypes)))
         {
@@ -81,7 +130,7 @@ public class DebugViewer : MonoBehaviour
             {
                 if (genType == DebugGenerationTypes.Random)
                 {
-                    chunk.seed = Random.Range(0, int.MaxValue);
+                    chunk.Seed = Random.Range(0, int.MaxValue);
                 }
                 
                 chunk.generationType = genType;

@@ -1,4 +1,5 @@
 using System;
+using TreeEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
@@ -10,11 +11,26 @@ public class Chunk : MonoBehaviour
 
     public const int MaxChunkHorizontalSize = 16;
 
+    public Texture2D debugNoise;
+
+    private Perlin perlin = new Perlin();
+
     [HideInInspector]
-    internal DebugGenerationTypes generationType = DebugGenerationTypes.Random;
+    internal DebugGenerationTypes generationType = DebugGenerationTypes.Procedural;
+
+    private int seed;
     
-    [HideInInspector]
-    public int seed = 0;
+    public int Seed
+    {
+        get => seed;
+        set
+        {
+            seed = value;
+            
+            perlin = new Perlin();
+            perlin.SetSeed(seed);
+        }
+    }
     
     [HideInInspector]
     public bool dirty = true;
@@ -35,28 +51,52 @@ public class Chunk : MonoBehaviour
         }
     }
 
+    public float GetNoise(int noiseSeed, int x, int z)
+    {
+        return Mathf.PerlinNoise
+        (
+            (float)x / chunkData.width, 
+            (float)z / chunkData.depth
+        );
+    }
+
     private BlockTypes GetBlock(int x, int y, int z)
     {
-        var blockNum = x + y + z;
-        
-        switch (generationType)
+        if (generationType == DebugGenerationTypes.Procedural)
         {
-            case DebugGenerationTypes.Full:
-                return BlockTypes.Solid;
-            case DebugGenerationTypes.Seconds:
-                return blockNum % 2 == 1 ? BlockTypes.Solid : BlockTypes.Air;
-            case DebugGenerationTypes.Thirds:
-                return blockNum % 3 == 1 ? BlockTypes.Solid : BlockTypes.Air;
-            case DebugGenerationTypes.Fourths:
-                return blockNum % 4 == 1 ? BlockTypes.Solid : BlockTypes.Air;
-            case DebugGenerationTypes.Random:
-                Random.InitState(Hash(seed, x, y, z));
-                return Mathf.RoundToInt(Random.value) == 1 ? BlockTypes.Solid : BlockTypes.Air;
-            default:
-                throw new Exception("Generation type not found!");
+            var noise = GetNoise(Seed, x, z);
+            var surfaceY = noise * 60;
+            
+            // var frequency = 0.2;
+            // var amplitude = 10;
+            // var xOffset = Math.Sin(x * frequency) * amplitude;
+            // var zOffset = Math.Sin(z * frequency) * amplitude;
+            // var surfaceY = 100 + xOffset + zOffset;
+            
+            return y < surfaceY ? BlockTypes.Solid : BlockTypes.Air;
+        }
+        else
+        {
+            var blockNum = x + y + z;
+            switch (generationType)
+            {
+                case DebugGenerationTypes.Full:
+                    return BlockTypes.Solid;
+                case DebugGenerationTypes.Seconds:
+                    return blockNum % 2 == 1 ? BlockTypes.Solid : BlockTypes.Air;
+                case DebugGenerationTypes.Thirds:
+                    return blockNum % 3 == 1 ? BlockTypes.Solid : BlockTypes.Air;
+                case DebugGenerationTypes.Fourths:
+                    return blockNum % 4 == 1 ? BlockTypes.Solid : BlockTypes.Air;
+                case DebugGenerationTypes.Random:
+                    Random.InitState(Hash(Seed, x, y, z));
+                    return Mathf.RoundToInt(Random.value) == 1 ? BlockTypes.Solid : BlockTypes.Air;
+                default:
+                    throw new Exception("Generation type not found!");
+            }
         }
     }
-    
+
     private static int Hash(int seed, params int[] numbers)
     {
         unchecked // Allow arithmetic overflow, numbers will just "wrap around"
