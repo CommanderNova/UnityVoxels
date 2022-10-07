@@ -71,11 +71,15 @@ public class DebugViewer : MonoBehaviour
         
         var chunkData = chunk.chunkData;
         chunk.debugNoise = new Texture2D(chunkData.width, chunkData.depth);
+        var origin = chunk.Origin;
 
-        for (var x = 0; x < chunkData.width; ++x)
+        for (var i = 0; i < chunkData.width; ++i)
         {
-            for (var z = 0; z < chunkData.depth; ++z)
+            for (var j = 0; j < chunkData.depth; ++j)
             {
+                var x = i + origin.x;
+                var z = j + origin.z;
+                
                 var value = chunk.GetNoise(chunk.Seed, x, z);
                 chunk.debugNoise.SetPixel(x, z, new Color(1.0f * value, 1.0f * value, 1.0f * value));
             }

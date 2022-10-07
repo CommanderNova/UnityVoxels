@@ -26,10 +26,11 @@ public class World : MonoBehaviour
 
                 newPosition = GetGridPosition(newPosition);
 
-                var newObject = Instantiate(chunkTemplate, newPosition, Quaternion.identity, transform);
+                var newObject = Instantiate(chunkTemplate, Vector3.zero, Quaternion.identity, transform);
                 var chunk = newObject.GetComponent<Chunk>();
                 if (chunk)
                 {
+                    chunk.Initialize(newPosition);
                     chunk.chunkData = Instantiate(chunk.chunkData);
                 }
             }

@@ -11,15 +11,18 @@ public class Chunk : MonoBehaviour
 
     public const int MaxChunkHorizontalSize = 16;
 
+    [HideInInspector]
     public Texture2D debugNoise;
+    
+
+    internal DebugGenerationTypes generationType = DebugGenerationTypes.Procedural;
 
     private Perlin perlin = new Perlin();
 
-    [HideInInspector]
-    internal DebugGenerationTypes generationType = DebugGenerationTypes.Procedural;
+    private Vector3Int origin;
+    public Vector3Int Origin => origin;
 
     private int seed;
-    
     public int Seed
     {
         get => seed;
@@ -41,6 +44,15 @@ public class Chunk : MonoBehaviour
     private Vector3[] vertices;
     private Vector2[] uvs;
     private int[] triangles;
+
+    public void Initialize(Vector3 position)
+    {
+        origin = new Vector3Int(
+            (int)Math.Round(position.x),
+            (int)Math.Round(position.y),
+            (int)Math.Round(position.z)
+        );
+    }
     
     private void Update()
     {
@@ -55,8 +67,8 @@ public class Chunk : MonoBehaviour
     {
         return Mathf.PerlinNoise
         (
-            (float)x / chunkData.width, 
-            (float)z / chunkData.depth
+            ((float)x / chunkData.width) + noiseSeed, 
+            ((float)z / chunkData.depth) + noiseSeed
         );
     }
 
@@ -170,12 +182,16 @@ public class Chunk : MonoBehaviour
         triangles = new int[MaxBlockCount * 36];
         var triangleIndex = -1;
 
-        for (var x = 0; x < width; ++x)
+        for (var i = 0; i < width; ++i)
         {
-            for (var z = 0; z < depth; ++z)
+            for (var j = 0; j < depth; ++j)
             {
-                for (var y = 0; y < height; ++y)
+                for (var k = 0; k < height; ++k)
                 {
+                    var x = i + origin.x;
+                    var z = j + origin.z;
+                    var y = k + origin.y;
+                    
                     var blockType = GetBlock(x, y, z);
 
                     if (blockType != BlockTypes.Solid)
