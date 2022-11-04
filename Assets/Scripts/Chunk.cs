@@ -122,11 +122,20 @@ public class Chunk : MonoBehaviour
         }
     }
     
-    private static bool IsBlockOutsideBoundaries(int x, int y, int z, int maxX, int maxY, int maxZ)
+    private static bool IsBlockOutsideBoundaries
+    (
+        int x, int y, int z, 
+        int minBoundsX, int maxBoundsX, 
+        int minBoundsY, int maxBoundsY, 
+        int minBoundsZ, int maxBoundsZ
+    )
     {
-        return !(x >= 0 && x < maxX &&
-                y >= 0 && y < maxY &&
-                z >= 0 && z < maxZ);
+        return 
+        !(
+            x >= minBoundsX && x < maxBoundsX &&
+            y >= minBoundsY && y < maxBoundsY &&
+            z >= minBoundsZ && z < maxBoundsZ
+        );
     }
 
     /// <summary>
@@ -134,21 +143,19 @@ public class Chunk : MonoBehaviour
     /// </summary>
     /// x, y and z: The current blocks coordinates
     /// <param name="blockFaceSettings">Settings for the face you want to check</param>
-    private bool IsFaceNeighbourSolid(in int x, in int y, in int z, in BlockFaceSettings blockFaceSettings)
+    private bool IsFaceNeighbourSolid(in int x, in int y, in int z, in BlockFaceSettings blockFaceSettings, in Vector3Int chunkOrigin)
     {
         var neighbourPosX = x + blockFaceSettings.NeighbourOffset.x;
         var neighbourPosY = y + blockFaceSettings.NeighbourOffset.y;
         var neighbourPosZ = z + blockFaceSettings.NeighbourOffset.z;
-        
+
         // Render faces that point outside of the chunk anyways for now, could be debug flagged as well
         // So dont make neighbour blocks that are outside of the boundaries count as solid
         var isNeighbourOutsideOfBoundary = IsBlockOutsideBoundaries(
-            neighbourPosX, 
-            neighbourPosY, 
-            neighbourPosZ, 
-            chunkData.width, 
-            chunkData.height, 
-            chunkData.depth
+            neighbourPosX, neighbourPosY, neighbourPosZ,
+            chunkOrigin.x, chunkOrigin.x + chunkData.width, 
+            chunkOrigin.y, chunkOrigin.y + chunkData.height, 
+            chunkOrigin.z, chunkOrigin.z + chunkData.depth
         );
         
         if (isNeighbourOutsideOfBoundary)
@@ -193,18 +200,17 @@ public class Chunk : MonoBehaviour
                     var y = k + origin.y;
                     
                     var blockType = GetBlock(x, y, z);
-
                     if (blockType != BlockTypes.Solid)
                     {
                         continue;
                     }
 
-                    var bottomSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.bottomFaceSettings);
-                    var backSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.backFaceSettings);
-                    var frontSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.frontFaceSettings);
-                    var topSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.topFaceSettings);
-                    var leftSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.leftFaceSettings);
-                    var rightSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.rightFaceSettings);
+                    var bottomSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.bottomFaceSettings, in origin);
+                    var backSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.backFaceSettings, in origin);
+                    var frontSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.frontFaceSettings, in origin);
+                    var topSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.topFaceSettings, in origin);
+                    var leftSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.leftFaceSettings, in origin);
+                    var rightSolid = IsFaceNeighbourSolid(in x, in y, in z, in BlockRendering.rightFaceSettings, in origin);
 
                     if (bottomSolid && backSolid && frontSolid && topSolid && leftSolid && rightSolid)
                     {

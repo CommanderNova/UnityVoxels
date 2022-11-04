@@ -172,6 +172,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &266729543
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -236,6 +237,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &376687625
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,6 +324,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &454927741
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -386,6 +389,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &507650683
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,6 +439,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &507650686
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -499,6 +504,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &611548714
 GameObject:
   m_ObjectHideFlags: 0
@@ -623,6 +629,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &677579266
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -687,6 +694,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &687534497
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,6 +744,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &687534500
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -800,6 +809,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1066,6 +1076,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &1221797764
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1130,6 +1141,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &1272321570
 GameObject:
   m_ObjectHideFlags: 0
@@ -1179,6 +1191,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &1272321573
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1243,6 +1256,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &1311639734
 GameObject:
   m_ObjectHideFlags: 0
@@ -1292,6 +1306,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &1311639737
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1356,6 +1371,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1 &1462452074
 GameObject:
   m_ObjectHideFlags: 0
@@ -1781,6 +1797,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!23 &2088080065
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1845,6 +1862,7 @@ MonoBehaviour:
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
   debugNoise: {fileID: 0}
   dirty: 1
+  testVec: {x: 0, y: 0, z: 0}
 --- !u!1001 &2090272495652471199
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1920,6 +1938,10 @@ PrefabInstance:
     - target: {fileID: 6019899646016968623, guid: 2b5d039b47d36ba48a19c734b0401490, type: 3}
       propertyPath: m_Name
       value: WorldRoot
+      objectReference: {fileID: 0}
+    - target: {fileID: 6019899646016968623, guid: 2b5d039b47d36ba48a19c734b0401490, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6019899646016968625, guid: 2b5d039b47d36ba48a19c734b0401490, type: 3}
       propertyPath: m_RootOrder

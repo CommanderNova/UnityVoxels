@@ -12,7 +12,6 @@ public class World : MonoBehaviour
     {
         var center = GetGridPosition(transform.position);
 
-        var halfChunkSize = Chunk.MaxChunkHorizontalSize / 2;
         for (var x = Chunk.MaxChunkHorizontalSize * -renderRadius; x < Chunk.MaxChunkHorizontalSize * renderRadius; x += Chunk.MaxChunkHorizontalSize)
         {
             for (var z = Chunk.MaxChunkHorizontalSize * -renderRadius; z < Chunk.MaxChunkHorizontalSize * renderRadius; z += Chunk.MaxChunkHorizontalSize)
