@@ -17,8 +17,6 @@ public class Chunk : MonoBehaviour
 
     internal DebugGenerationTypes generationType = DebugGenerationTypes.Procedural;
 
-    private Perlin perlin = new Perlin();
-
     private Vector3Int origin;
     public Vector3Int Origin => origin;
 
@@ -26,13 +24,7 @@ public class Chunk : MonoBehaviour
     public int Seed
     {
         get => seed;
-        set
-        {
-            seed = value;
-            
-            perlin = new Perlin();
-            perlin.SetSeed(seed);
-        }
+        set => seed = value;
     }
     
     [HideInInspector]
@@ -65,10 +57,11 @@ public class Chunk : MonoBehaviour
 
     public float GetNoise(int noiseSeed, int x, int z)
     {
+        // Removed usage of seed for now as values above "2000000" seem to be breaking the noise
         return Mathf.PerlinNoise
         (
-            ((float)x / chunkData.width) + noiseSeed, 
-            ((float)z / chunkData.depth) + noiseSeed
+            ((float)x / chunkData.width), 
+            ((float)z / chunkData.depth)
         );
     }
 
