@@ -80,6 +80,7 @@ public class DebugViewer : MonoBehaviour
                 var x = i + origin.x;
                 var z = j + origin.z;
                 
+                // TODO ML: this might not account for changes of the x and z input values from the GetBlock method
                 var value = chunk.GetNoise(chunk.Seed, x, z);
                 chunk.debugNoise.SetPixel(x, z, new Color(1.0f * value, 1.0f * value, 1.0f * value));
             }

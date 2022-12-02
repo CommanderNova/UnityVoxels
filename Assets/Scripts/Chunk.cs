@@ -69,13 +69,14 @@ public class Chunk : MonoBehaviour
     {
         if (generationType == DebugGenerationTypes.Procedural)
         {
-            var noise = GetNoise(Seed, x, z);
-            var surfaceY = noise * 60;
+            var noiseZoom = 1f;
+            var noise = GetNoise(Seed, Mathf.RoundToInt(x * noiseZoom), Mathf.RoundToInt(z * noiseZoom));
+            var surfaceY = 100 + noise * 20;
             
             // var frequency = 0.2;
             // var amplitude = 10;
             // var xOffset = Math.Sin(x * frequency) * amplitude;
-            // var zOffset = Math.Sin(z * frequency) * amplitude;
+            // var zOffset = Math.Sin(z * frequency * 4) * amplitude;
             // var surfaceY = 100 + xOffset + zOffset;
             
             return y < surfaceY ? BlockTypes.Solid : BlockTypes.Air;
