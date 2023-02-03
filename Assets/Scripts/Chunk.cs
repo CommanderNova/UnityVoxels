@@ -1,5 +1,4 @@
 using System;
-using TreeEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using Random = UnityEngine.Random;
@@ -169,8 +168,11 @@ public class Chunk : MonoBehaviour
         };
 
         GetComponent<MeshFilter>().mesh = mesh;
-        
-        print($"Generating chunk (width: {chunkData.width}, height: {chunkData.height}, depth: {chunkData.depth}) ...");
+
+        if (DebugVar.VERBOSE_CHUNK_LOGS)
+        {
+            print($"Generating chunk (width: {chunkData.width}, height: {chunkData.height}, depth: {chunkData.depth}) ...");
+        }
         
         var startTime = Time.realtimeSinceStartupAsDouble;
 
@@ -279,8 +281,11 @@ public class Chunk : MonoBehaviour
         Array.Resize(ref triangles, triangleIndex + 1);
         mesh.triangles = triangles;
 
-        var duration = Time.realtimeSinceStartupAsDouble - startTime;
-        print($"Vertices in the buffer: {verticesIndex + 1}");
-        print($"Duration: {(duration * 1000)}ms");
+        if (DebugVar.VERBOSE_CHUNK_LOGS)
+        {
+            var duration = Time.realtimeSinceStartupAsDouble - startTime;
+            print($"Vertices in the buffer: {verticesIndex + 1}");
+            print($"Duration: {(duration * 1000)}ms");
+        }
     }
 }

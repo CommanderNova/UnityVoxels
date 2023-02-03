@@ -11,7 +11,8 @@ public class World : MonoBehaviour
     void Start()
     {
         var center = GetGridPosition(transform.position);
-
+        var startTime = Time.realtimeSinceStartupAsDouble;
+        var counter = 0;
         for (var x = Chunk.MaxChunkHorizontalSize * -renderRadius; x < Chunk.MaxChunkHorizontalSize * renderRadius; x += Chunk.MaxChunkHorizontalSize)
         {
             for (var z = Chunk.MaxChunkHorizontalSize * -renderRadius; z < Chunk.MaxChunkHorizontalSize * renderRadius; z += Chunk.MaxChunkHorizontalSize)
@@ -31,9 +32,14 @@ public class World : MonoBehaviour
                 {
                     chunk.Initialize(newPosition);
                     chunk.chunkData = Instantiate(chunk.chunkData);
+
+                    counter++;
                 }
             }
         }
+        
+        var duration = Time.realtimeSinceStartupAsDouble - startTime;
+        print($"Chunks build: <{counter}> in duration: <{duration * 1000}ms>");
     }
 
     Vector3 GetGridPosition(Vector3 position)

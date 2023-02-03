@@ -16,8 +16,6 @@ internal enum DebugGenerationTypes
 
 public class DebugViewer : MonoBehaviour
 {
-    private Chunk notSelectedChunk;
-
     [SerializeField]
     private RawImage noiseViewer;
 
@@ -26,17 +24,6 @@ public class DebugViewer : MonoBehaviour
 
     private GameObject selectedGameObject;
     
-    private void Start()
-    {
-        notSelectedChunk = new Chunk();
-        notSelectedChunk.chunkData = new ChunkData
-        {
-            width = -1,
-            depth = -1,
-            height = -1,
-        };
-    }
-
     private void OnGUI()
     {
         var activeObject = Selection.activeGameObject;
