@@ -36,13 +36,15 @@ public class Chunk : MonoBehaviour
     private Vector2[] uvs;
     private int[] triangles;
 
-    public void Initialize(Vector3 position)
+    public void Initialize(Vector3 position, int worldSeed)
     {
         origin = new Vector3Int(
             (int)Math.Round(position.x),
             (int)Math.Round(position.y),
             (int)Math.Round(position.z)
         );
+
+        Seed = worldSeed;
     }
     
     private void Update()
@@ -59,8 +61,8 @@ public class Chunk : MonoBehaviour
         // Removed usage of seed for now as values above "2000000" seem to be breaking the noise
         return Mathf.PerlinNoise
         (
-            ((float)x / chunkData.width), 
-            ((float)z / chunkData.depth)
+            (((float)x / chunkData.width) + noiseSeed * noiseSeed) - noiseSeed, 
+            (((float)z / chunkData.depth) + noiseSeed * noiseSeed) - noiseSeed
         );
     }
 

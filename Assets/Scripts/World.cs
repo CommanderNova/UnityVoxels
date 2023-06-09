@@ -7,9 +7,14 @@ public class World : MonoBehaviour
 
     [SerializeField]
     private GameObject chunkTemplate;
+
+    private int Seed;
     
     void Start()
     {
+        Seed = 20; //Random.Range(0, 200000);
+        print("Seed is: " + Seed);
+        
         var center = GetGridPosition(transform.position);
         var startTime = Time.realtimeSinceStartupAsDouble;
         var counter = 0;
@@ -30,7 +35,7 @@ public class World : MonoBehaviour
                 var chunk = newObject.GetComponent<Chunk>();
                 if (chunk)
                 {
-                    chunk.Initialize(newPosition);
+                    chunk.Initialize(newPosition, Seed);
                     chunk.chunkData = Instantiate(chunk.chunkData);
 
                     counter++;
