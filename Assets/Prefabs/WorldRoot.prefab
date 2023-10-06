@@ -45,3 +45,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   renderRadius: 6
   chunkTemplate: {fileID: 2090272495926871971, guid: 4bc036dbd58292d4e862474e16d1ca7d, type: 3}
+  noiseZoom: 1
+  baseSurfaceLevel: 100
+  noiseMultiplier: 20
+  noiseZoom: 1
+  baseSurfaceLevel: 100
+  noiseMultiplier: 20
+  noiseZoom: 1
+  baseSurfaceLevel: 100
+  noiseMultiplier: 20

@@ -95,3 +95,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chunkData: {fileID: 11400000, guid: 3f06c9315e21fbc41ba244bd94fda078, type: 2}
+  debugNoise: {fileID: 0}
+  noiseZoom: 1
+  baseSurfaceLevel: 100
+  noiseMultiplier: 20
+  dirty: 1
+  debugNoise: {fileID: 0}
+  noiseZoom: 1
+  baseSurfaceLevel: 100
+  noiseMultiplier: 20
+  dirty: 1
+  debugNoise: {fileID: 0}
+  noiseZoom: 1
+  baseSurfaceLevel: 100
+  noiseMultiplier: 20
+  dirty: 1
