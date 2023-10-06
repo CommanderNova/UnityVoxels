@@ -73,11 +73,11 @@ public class Chunk : MonoBehaviour
 
     public float GetNoise(int noiseSeed, int x, int z)
     {
-        // Removed usage of seed for now as values above "2000000" seem to be breaking the noise
+        noiseSeed %= 1048569;
         return Mathf.PerlinNoise
         (
-            (((float)x / chunkData.width) + noiseSeed * noiseSeed) - noiseSeed, 
-            (((float)z / chunkData.depth) + noiseSeed * noiseSeed) - noiseSeed
+            (((float)x / chunkData.width) + noiseSeed), 
+            (((float)z / chunkData.depth) + noiseSeed)
         );
     }
 

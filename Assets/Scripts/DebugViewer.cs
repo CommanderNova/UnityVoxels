@@ -27,6 +27,9 @@ public class DebugViewer : MonoBehaviour
 
     private GameObject selectedGameObject;
 
+    private string inputSeedText = "0";
+    private bool inputRandomizeSeed = false;
+
     private void Start()
     {
         UpdateGeneralNoiseImage();
@@ -51,13 +54,32 @@ public class DebugViewer : MonoBehaviour
         else
         {
             GUI.Label(new Rect(25, 25, 200, 30), "Select Chunk to debug");
-            if (GUI.Button(new Rect(25, 25 + 30, 200, 150), "Regenerate All"))
+            if (GUI.Button(new Rect(25, 25 + 30, 200, 50), "Regenerate All"))
             {
                 var world = FindObjectOfType<World>();
                 if (world)
                 {
                     world.RegenerateWorld();
                 }
+            }
+
+            inputSeedText = GUI.TextField(new Rect(25, 25 + 100, 100, 30), inputSeedText);
+            inputRandomizeSeed = GUI.Toggle(new Rect(125, 25 + 100, 200, 30), inputRandomizeSeed, "Randomize Seed?");
+            
+            if (GUI.Button(new Rect(25, 25 + 130, 200, 50), "Regenerate Noise Only"))
+            {
+                var newSeed = 0;
+                if (inputRandomizeSeed)
+                {
+                    newSeed = Random.Range(-int.MaxValue, int.MaxValue);
+                    inputSeedText = newSeed.ToString();
+                }
+                else if (int.TryParse(inputSeedText, out var parsedSeed))
+                {
+                    newSeed = parsedSeed;
+                }
+
+                RegenerateOnlyNoise(newSeed);
             }
         }
     }
@@ -138,6 +160,18 @@ public class DebugViewer : MonoBehaviour
         
         generalNoise.Apply();
         noiseViewer.texture = generalNoise;
+    }
+
+    private void RegenerateOnlyNoise(int seed)
+    {
+        var world = FindObjectOfType<World>();
+        var allChunks = world.GetAllChunks();
+        foreach (var chunk in allChunks)
+        {
+            chunk.Seed = seed;
+        }
+
+        UpdateGeneralNoiseImage();
     }
 
     private void OnChunkUpdate(Chunk chunk)
