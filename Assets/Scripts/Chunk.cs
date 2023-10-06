@@ -25,6 +25,14 @@ public class Chunk : MonoBehaviour
         get => seed;
         set => seed = value;
     }
+
+    #region Landscape Generation Vars
+
+    public float noiseZoom = 1.0f;
+    public float baseSurfaceLevel = 100.0f;
+    public float noiseMultiplier = 20.0f;
+    
+    #endregion
     
     [HideInInspector]
     public bool dirty = true;
@@ -45,6 +53,13 @@ public class Chunk : MonoBehaviour
         );
 
         Seed = worldSeed;
+        
+        mesh = new Mesh
+        {
+            indexFormat = IndexFormat.UInt32,
+        };
+
+        GetComponent<MeshFilter>().mesh = mesh;
     }
     
     private void Update()
@@ -70,9 +85,8 @@ public class Chunk : MonoBehaviour
     {
         if (generationType == DebugGenerationTypes.Procedural)
         {
-            var noiseZoom = 1f;
             var noise = GetNoise(Seed, Mathf.RoundToInt(x * noiseZoom), Mathf.RoundToInt(z * noiseZoom));
-            var surfaceY = 100 + noise * 20;
+            var surfaceY = baseSurfaceLevel + noise * noiseMultiplier;
             
             // var frequency = 0.2;
             // var amplitude = 10;
@@ -161,16 +175,15 @@ public class Chunk : MonoBehaviour
         var neighbourBlock = GetBlock(neighbourPosX, neighbourPosY, neighbourPosZ);
         return neighbourBlock == BlockTypes.Solid;
     }
+
+    public void RegenerateChunk()
+    {
+        dirty = false;
+        GenerateChunk(chunkData.width, chunkData.height, chunkData.depth);
+    }
     
     private void GenerateChunk(int width, int height, int depth)
     {
-        mesh = new Mesh
-        {
-            indexFormat = IndexFormat.UInt32,
-        };
-
-        GetComponent<MeshFilter>().mesh = mesh;
-
         if (DebugVar.VERBOSE_CHUNK_LOGS)
         {
             print($"Generating chunk (width: {chunkData.width}, height: {chunkData.height}, depth: {chunkData.depth}) ...");

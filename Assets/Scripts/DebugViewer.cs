@@ -40,6 +40,14 @@ public class DebugViewer : MonoBehaviour
             else
             {
                 GUI.Label(new Rect(25, 25, 200, 30), "Select Chunk to debug");
+                if (GUI.Button(new Rect(25, 25 + 30, 200, 150), "Regenerate All"))
+                {
+                    var world = FindObjectOfType<World>();
+                    if (world)
+                    {
+                        world.RegenerateWorld();
+                    }
+                }
             }
         }
         else
