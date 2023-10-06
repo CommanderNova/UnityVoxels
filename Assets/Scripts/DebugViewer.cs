@@ -19,11 +19,19 @@ public class DebugViewer : MonoBehaviour
     [SerializeField]
     private RawImage noiseViewer;
 
+    [HideInInspector]
+    public Texture2D generalNoise;
+    
     [SerializeField]
     private GameObject noiseUIGroup;
 
     private GameObject selectedGameObject;
-    
+
+    private void Start()
+    {
+        UpdateGeneralNoiseImage();
+    }
+
     private void OnGUI()
     {
         var activeObject = Selection.activeGameObject;
@@ -31,39 +39,43 @@ public class DebugViewer : MonoBehaviour
         selectedGameObject = activeObject;
         
         var activeChunk = activeObject ? activeObject.GetComponent<Chunk>() : null;
-        if (isSameObject)
+        if (!isSameObject)
         {
-            if (activeChunk)
-            {
-                OnChunkUpdate(activeChunk);
-            }
-            else
-            {
-                GUI.Label(new Rect(25, 25, 200, 30), "Select Chunk to debug");
-                if (GUI.Button(new Rect(25, 25 + 30, 200, 150), "Regenerate All"))
-                {
-                    var world = FindObjectOfType<World>();
-                    if (world)
-                    {
-                        world.RegenerateWorld();
-                    }
-                }
-            }
+            OnChunkChanged(activeChunk);
+        }
+        
+        if (activeChunk)
+        {
+            OnChunkUpdate(activeChunk);
         }
         else
         {
-            OnChunkChanged(activeChunk);
+            GUI.Label(new Rect(25, 25, 200, 30), "Select Chunk to debug");
+            if (GUI.Button(new Rect(25, 25 + 30, 200, 150), "Regenerate All"))
+            {
+                var world = FindObjectOfType<World>();
+                if (world)
+                {
+                    world.RegenerateWorld();
+                }
+            }
         }
     }
 
     private void OnChunkChanged(Chunk chunk)
     {
-        noiseUIGroup.SetActive(chunk);
-        if (!chunk)
+        if (chunk)
         {
-            return;
+            UpdateSpecificNoiseImage(chunk);
         }
-        
+        else
+        {
+            UpdateGeneralNoiseImage();
+        }
+    }
+
+    private void UpdateSpecificNoiseImage(Chunk chunk, bool apply = true)
+    {
         var chunkData = chunk.chunkData;
         chunk.debugNoise = new Texture2D(chunkData.width, chunkData.depth);
         var origin = chunk.Origin;
@@ -74,17 +86,60 @@ public class DebugViewer : MonoBehaviour
             {
                 var x = i + origin.x;
                 var z = j + origin.z;
-                
+
                 // TODO ML: this might not account for changes of the x and z input values from the GetBlock method
                 var value = chunk.GetNoise(chunk.Seed, x, z);
                 chunk.debugNoise.SetPixel(x, z, new Color(1.0f * value, 1.0f * value, 1.0f * value));
             }
         }
-        
-        chunk.debugNoise.Apply();
-        noiseViewer.texture = chunk.debugNoise;
+
+        if (apply)
+        {
+            chunk.debugNoise.Apply();
+            noiseViewer.texture = chunk.debugNoise;
+        }
     }
-    
+
+    private void UpdateGeneralNoiseImage()
+    {
+        var world = FindObjectOfType<World>();
+        var allChunks = world.GetAllChunks();
+        foreach (var chunk in allChunks)
+        {
+            UpdateSpecificNoiseImage(chunk, false);
+        }
+
+        var renderRadius = world.GetRenderRadius();
+        var width = (Chunk.MaxChunkHorizontalSize * renderRadius * 2);
+        var depth = width - Chunk.MaxChunkHorizontalSize;
+        
+        generalNoise = new Texture2D(width, depth);
+        var posX = 0;
+        var posZ = depth;
+        foreach (var chunk in allChunks)
+        {
+            var debugNoise = chunk.debugNoise;
+            for (int i = 0; i < Chunk.MaxChunkHorizontalSize; i++)
+            {
+                for (int j = 0; j < Chunk.MaxChunkHorizontalSize; j++)
+                {
+                    var pixel = debugNoise.GetPixel(i, j);
+                    generalNoise.SetPixel(posX + i, posZ + j, pixel);
+                }
+            }
+            
+            posX += Chunk.MaxChunkHorizontalSize;
+            if (posX >= width)
+            {
+                posX = 0;
+                posZ -= Chunk.MaxChunkHorizontalSize;
+            }
+        }
+        
+        generalNoise.Apply();
+        noiseViewer.texture = generalNoise;
+    }
+
     private void OnChunkUpdate(Chunk chunk)
     {
         if (chunk.dirty)

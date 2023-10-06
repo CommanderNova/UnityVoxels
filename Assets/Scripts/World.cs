@@ -5,6 +5,7 @@ public class World : MonoBehaviour
 {
     [SerializeField]
     private int renderRadius = 8;
+    public int GetRenderRadius() => renderRadius;
 
     [SerializeField]
     private GameObject chunkTemplate;
@@ -17,7 +18,8 @@ public class World : MonoBehaviour
     public float noiseMultiplier = 20.0f;
 
     private readonly List<Chunk> allChunks = new List<Chunk>();
-
+    public List<Chunk> GetAllChunks() => allChunks;
+    
     public void RegenerateWorld()
     {
         var startTime = Time.realtimeSinceStartupAsDouble;
@@ -42,9 +44,9 @@ public class World : MonoBehaviour
         
         var center = GetGridPosition(transform.position);
         var startTime = Time.realtimeSinceStartupAsDouble;
-        for (var x = Chunk.MaxChunkHorizontalSize * -renderRadius; x < Chunk.MaxChunkHorizontalSize * renderRadius; x += Chunk.MaxChunkHorizontalSize)
+        for (var z = Chunk.MaxChunkHorizontalSize * renderRadius; z > Chunk.MaxChunkHorizontalSize * -renderRadius; z -= Chunk.MaxChunkHorizontalSize)
         {
-            for (var z = Chunk.MaxChunkHorizontalSize * -renderRadius; z < Chunk.MaxChunkHorizontalSize * renderRadius; z += Chunk.MaxChunkHorizontalSize)
+            for (var x = Chunk.MaxChunkHorizontalSize * -renderRadius; x < Chunk.MaxChunkHorizontalSize * renderRadius; x += Chunk.MaxChunkHorizontalSize)
             {
                 var newPosition = new Vector3
                 (
